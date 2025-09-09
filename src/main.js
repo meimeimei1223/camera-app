@@ -49,11 +49,17 @@ function showMedia(element) {
 // カメラ開始
 startCameraBtn.addEventListener('click', async () => {
     try {
+        // メディアデバイスサポートをチェック
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('お使いのブラウザはカメラアクセスをサポートしていません');
+        }
+
+        showStatus('カメラアクセスを要求中...', 'success');
+        
+        // より基本的な設定でカメラアクセスを試行
         stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            } 
+            video: true,
+            audio: false
         });
         
         video.srcObject = stream;
@@ -64,8 +70,34 @@ startCameraBtn.addEventListener('click', async () => {
         
         showStatus('カメラが開始されました', 'success');
     } catch (err) {
-        showStatus(`カメラアクセスエラー: ${err.message}`, 'error');
-        console.error('Camera error:', err);
+        let errorMessage = 'カメラアクセスエラー: ';
+        
+        switch (err.name) {
+            case 'NotAllowedError':
+                errorMessage += '📹 カメラへのアクセスが拒否されました。ブラウザの設定でカメラ許可を与えてください。';
+                break;
+            case 'NotFoundError':
+                errorMessage += '📷 カメラが見つかりません。カメラが接続されているか確認してください。';
+                break;
+            case 'NotReadableError':
+                errorMessage += '🔧 カメラが他のアプリケーションで使用されている可能性があります。';
+                break;
+            case 'OverconstrainedError':
+                errorMessage += '⚙️ カメラの設定に問題があります。';
+                break;
+            case 'SecurityError':
+                errorMessage += '🔒 セキュリティ制限によりカメラにアクセスできません。';
+                break;
+            default:
+                errorMessage += `${err.message} (${err.name})`;
+        }
+        
+        showStatus(errorMessage, 'error');
+        console.error('Camera error details:', {
+            name: err.name,
+            message: err.message,
+            stack: err.stack
+        });
     }
 });
 

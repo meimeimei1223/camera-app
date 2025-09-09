@@ -5,12 +5,13 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://localhost:5174",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Camera Viewer",
         "width": 1000,
         "height": 700,
@@ -24,17 +25,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb", "appimage", "msi", "dmg"]
+    "targets": ["deb", "appimage", "msi", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ]
   },
-  "plugins": {
-    "dialog": {
-      "all": true,
-      "open": true,
-      "save": true
-    },
-    "fs": {
-      "all": true,
-      "scope": ["$APPDATA/*", "$DOWNLOAD/*", "$PICTURE/*"]
-    }
-  }
+  "plugins": {}
 }
